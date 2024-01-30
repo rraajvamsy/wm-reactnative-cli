@@ -1,16 +1,23 @@
-const execa = require('execa');
-const logger = require('./logger');
-const loggerLabel = 'exec';
+import execa from "execa";
+import { logger } from './logger'
+const  loggerLabel  = 'exec'
+
+
 
 class OutputPipe {
-    constructor(bufferSize, log, loggerLabel) {
+    output: string;
+    content: any[];
+    bufferSize: number;
+    logOutput: boolean;
+    loggerLabel: string;
+    constructor(bufferSize: number, log: boolean) {
         this.output = '';
         this.content = [];
         this.bufferSize = bufferSize || 100;
         this.logOutput = (log !== false);
         this.loggerLabel = loggerLabel;
     }
-    log(str, isErrorType) {
+    log(str: string, isErrorType?: any) {
         let reminder = '';
         str.split('\n').forEach((v, i, splits) => {
             if (i < splits.length - 1) {
@@ -25,7 +32,7 @@ class OutputPipe {
         });
         return reminder;
     }
-    push(str, isErrorType) {
+    push(str: string, isErrorType?: any) {
         if (str) {
             this.output = this.log(this.output + str, isErrorType) || '';
         }
@@ -35,19 +42,18 @@ class OutputPipe {
     }
 }
 
-module.exports = {
-    'exec': (cmd, args, options) => {
-        logger.debug({label: loggerLabel, message: 'executing: ' + cmd + ' ' + (args && args.join(' '))});
-        const outputPipe = new OutputPipe(100, options && options.log, cmd.substr(cmd.lastIndexOf('/') + 1));
+export async function exec(cmd: any, args: any, options?: any) {
+    logger.debug({label: 'exec', message: 'executing: ' + cmd + ' ' + (args && args.join(' '))});
+        const outputPipe = new OutputPipe(100, options && options.log);
         const spawn = execa(cmd, args, options);
-        spawn.stdout.on('data', (data) => {
-            outputPipe.push(String.fromCharCode.apply(null, new Uint16Array(data)));
+        spawn.stdout!.on('data', (data: any) => {
+            outputPipe.push(String.fromCharCode.apply(null, new Uint16Array(data) as any));
         });
-        spawn.stderr.on('data', (data) => {
-            outputPipe.push(String.fromCharCode.apply(null, new Uint16Array(data)), true);
+        spawn.stderr!.on('data', (data: any) => {
+            outputPipe.push(String.fromCharCode.apply(null, new Uint16Array(data) as any), true);
         });
         return new Promise((resolve, reject) => {
-            spawn.on('close', code => {
+            spawn.on('close', (code: any) => {
                 outputPipe.flush();
                 if (code == 0) {
                     resolve(outputPipe.content);
@@ -56,5 +62,6 @@ module.exports = {
                 }
             });
         });
-    }
-};
+    
+}
+

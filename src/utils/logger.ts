@@ -14,7 +14,7 @@ const consoleFormat = printf(({
     message,
     label,
     timestamp
-}) => {
+}: any) => {
     return `${timestamp} [${label}] [${level}]: ${message}`;
 });
 
@@ -23,7 +23,7 @@ const jsonFormat = printf(({
     message,
     label,
     timestamp
-}) => {
+}: any) => {
     return JSON.stringify({
         timestamp,
         label,
@@ -31,7 +31,7 @@ const jsonFormat = printf(({
         message
     });
 });
-var logger = createLogger({
+export var logger = createLogger({
     level: 'debug',
     transports: [
         new(transports.Console)({
@@ -46,7 +46,7 @@ var logger = createLogger({
     ]
 });
 
-logger.setLogDirectory = (path) => {
+logger.setLogDirectory = (path: string) => {
     logger.configure({
         level: 'debug',
         transports: [
@@ -82,5 +82,3 @@ logger.setLogDirectory = (path) => {
         ]
     });
 };
-
-module.exports = logger;
