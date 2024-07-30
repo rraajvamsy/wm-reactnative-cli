@@ -32,7 +32,7 @@ async function updatePackageJsonFile(path) {
         const jsonData = JSON.parse(data);
         jsonData['main'] = "index";
         if (config.embed) {
-            jsonData['dependencies']['@wavemaker/expo-native-module'] = "latest";
+            // jsonData['dependencies']['@wavemaker/expo-native-module'] = "latest";
         }
         if(!jsonData['devDependencies']['@babel/plugin-proposal-optional-chaining']){
             jsonData['devDependencies']['@babel/plugin-proposal-optional-chaining'] = "^7.21.0";

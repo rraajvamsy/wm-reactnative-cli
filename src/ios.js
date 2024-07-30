@@ -118,6 +118,14 @@ async function embed(args) {
     fs.copyFileSync(`${__dirname}/../templates/embed/ios/ReactNativeView.swift`, `${rnModulePath}/ReactNativeView.swift`);
     fs.copyFileSync(`${__dirname}/../templates/embed/ios/ReactNativeView.h`, `${rnModulePath}/ReactNativeView.h`);
     fs.copyFileSync(`${__dirname}/../templates/embed/ios/ReactNativeView.m`, `${rnModulePath}/ReactNativeView.m`);
+    fs.copyFileSync(`${__dirname}/../templates/embed/ios/Podfile`, `${embedProject}/Podfile`);
+    const projectName = fs.readdirSync(`${config.src}ios-embed`)
+    .find(f => f.endsWith('xcodeproj'))
+    .split('.')[0];
+    // fs.copyFileSync(`${rnIosProject}/ios/Podfile`, `${rnIosProject}/ios-embed/Podfile`);
+    await readAndReplaceFileContent(`${embedProject}/Podfile`, (content) => {
+        return content.replace(/target .* do/g, `target '${projectName}' do`);
+    })
     await readAndReplaceFileContent(
         `${rnIosProject}/app.js`,
         (content) => content.replace('props = props || {};', 'props = props || {};\n\tprops.landingPage = props.landingPage || props.pageName;'));
